@@ -2,13 +2,14 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Three.js + GLTF + OrbitControls</title>
-       <link rel="stylesheet" href="./src/style.css" />
+    <title>Three.js FPS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./src/style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/nipplejs@0.9.0/dist/nipplejs.min.js"></script>
     <style>
       body {
         margin: 0;
         overflow: hidden;
-        
       }
 
       canvas {
@@ -16,13 +17,36 @@
         width: 100vw;
         height: 100vh;
       }
+
+      #joystick-container {
+        position: absolute;
+        bottom: 30px;
+        left: 30px;
+        width: 150px;
+        height: 150px;
+        z-index: 999;
+      }
+
+      #crosshair {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        width: 32px;
+        height: 32px;
+        transform: translate(-50%, -50%);
+        background: url('/red_crosshair.png') no-repeat center center;
+        background-size: contain;
+        pointer-events: none;
+        z-index: 1000;
+      }
     </style>
   </head>
   <body>
     <canvas id="canvas"></canvas>
-<div id="crosshair"></div>
-  <script type="module" src="./src/main.js"></script>
-    <!-- Load your Three.js entry point -->
+    <div id="crosshair"></div>
+    <div id="joystick-container"></div>
+
+    <!-- Load your main script -->
     <script type="module" src="./src/main.js"></script>
   </body>
 </html>
