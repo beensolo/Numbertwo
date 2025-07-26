@@ -71,7 +71,7 @@ if (!isMobile) {
   joystick.on('move', (evt, data) => {
     const rad = data.angle.radian;
     joystickDirection.x = Math.cos(rad) * data.force;
-    joystickDirection.z = Math.sin(rad) * data.force;
+    joystickDirection.z = -Math.sin(rad) * data.force;
   });
 
   joystick.on('end', () => {
