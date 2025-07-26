@@ -154,7 +154,7 @@ window.addEventListener('resize', () => {
 function animate() {
   requestAnimationFrame(animate);
   updateMovement();
-  if (model) model.rotation.y += 0.01;
+ // if (model) model.rotation.y += 0.01;
   renderer.render(scene, camera);
 }
 animate();
