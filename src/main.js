@@ -72,3 +72,14 @@ window.addEventListener('resize', () => {
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
+
+
+const honk = new Audio('/honk1.mp3');
+
+// Add click listener
+window.addEventListener('click', () => {
+    honk.currentTime = 0; // rewind to start
+    honk.play().catch(err => {
+        console.warn('Honk blocked by browser until user interaction:', err);
+    });
+});
