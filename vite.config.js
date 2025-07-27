@@ -8,6 +8,7 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, 'index.html'),
         truck: resolve(__dirname, 'truck.html'),
+        box: resolve(__dirname, 'box.html'),
       }
     }
   }
