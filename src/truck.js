@@ -1,7 +1,7 @@
+// truck.js
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
-// Canvas and Scene Setup
 const canvas = document.querySelector('#canvas');
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x202020);
@@ -13,20 +13,20 @@ const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-// Lights
 const light = new THREE.HemisphereLight(0xffffff, 0x444444, 1);
 light.position.set(0, 20, 10);
 scene.add(light);
 
-// Pivot for orbit-style rotation
 const pivot = new THREE.Object3D();
 scene.add(pivot);
 
-// Textures & Mesh Click Targets
 const textureLoader = new THREE.TextureLoader();
 const clickableMeshes = [];
-
 const loader = new GLTFLoader();
+
+
+
+
 loader.load('ptruck.glb', glb => {
   const model = glb.scene;
   model.position.y = 0.5;
@@ -34,12 +34,19 @@ loader.load('ptruck.glb', glb => {
 
   model.traverse(child => {
     if (child.isMesh) {
-      if (child.name.toLowerCase() === 'plane') {
+      const name = child.name.toLowerCase();
+
+      if (name === 'plane') {
         const bakedTexture = textureLoader.load('noise_texture.png');
+        bakedTexture.flipY = false;
+        bakedTexture.offset.y = -0.28;
         child.material = new THREE.MeshBasicMaterial({ map: bakedTexture });
       }
 
-      if (child.name.toLowerCase().includes('truck')) {
+      if (name.includes('truck')) {
+        const truckTexture = textureLoader.load('truck_texture.png');
+       truckTexture.flipY = false;
+        child.material = new THREE.MeshBasicMaterial({ map: truckTexture, side: THREE.FrontSide });
         child.name = 'truckButton';
         clickableMeshes.push(child);
       }
@@ -49,14 +56,12 @@ loader.load('ptruck.glb', glb => {
   pivot.add(model);
 });
 
-// Raycasting for clicks and hover
 const raycaster = new THREE.Raycaster();
 const mouse = new THREE.Vector2();
 
 canvas.addEventListener('click', event => {
   mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
   mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
   raycaster.setFromCamera(mouse, camera);
   const intersects = raycaster.intersectObjects(clickableMeshes, true);
   for (const obj of intersects) {
@@ -65,14 +70,11 @@ canvas.addEventListener('click', event => {
       return;
     }
   }
-
-
 });
 
 canvas.addEventListener('mousemove', event => {
   mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
   mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
   raycaster.setFromCamera(mouse, camera);
   const intersects = raycaster.intersectObjects(clickableMeshes, true);
   const hovering = intersects.some(obj => obj.object.name === 'truckButton');
@@ -80,7 +82,6 @@ canvas.addEventListener('mousemove', event => {
   document.body.classList.toggle('default-cursor', !hovering);
 });
 
-// Mouse drag orbit
 let isDragging = false;
 let prev = { x: 0, y: 0 };
 let rotationY = 0;
@@ -96,11 +97,9 @@ canvas.addEventListener('mousemove', e => {
   if (!isDragging) return;
   const deltaX = e.clientX - prev.x;
   const deltaY = e.clientY - prev.y;
-
   rotationY -= deltaX * 0.01;
   rotationX += deltaY * 0.005;
   rotationX = THREE.MathUtils.clamp(rotationX, 0, 1);
-
   pivot.rotation.set(rotationX, rotationY, 0);
   prev.x = e.clientX;
   prev.y = e.clientY;
@@ -142,20 +141,16 @@ canvas.addEventListener('touchmove', e => {
   if (e.touches.length === 1 && lastTouch) {
     const deltaX = e.touches[0].clientX - lastTouch.x;
     const deltaY = e.touches[0].clientY - lastTouch.y;
-
     rotationY -= deltaX * 0.01;
     rotationX += deltaY * 0.005;
     rotationX = THREE.MathUtils.clamp(rotationX, 0, 1);
-
     pivot.rotation.set(rotationX, rotationY, 0);
-
     lastTouch.x = e.touches[0].clientX;
     lastTouch.y = e.touches[0].clientY;
   } else if (e.touches.length === 2 && initialPinchDistance !== null) {
     const dx = e.touches[0].clientX - e.touches[1].clientX;
     const dy = e.touches[0].clientY - e.touches[1].clientY;
     const currentDistance = Math.sqrt(dx * dx + dy * dy);
-
     const zoomFactor = initialPinchDistance / currentDistance;
     camera.position.z = THREE.MathUtils.clamp(initialCameraZ * zoomFactor, 5, 100);
   }
@@ -166,15 +161,13 @@ canvas.addEventListener('touchend', () => {
   initialPinchDistance = null;
 });
 
-
 function animate() {
   requestAnimationFrame(animate);
   renderer.render(scene, camera);
 }
 animate();
 
-
-// ✅ MINESWEEPER INIT
+// Minesweeper
 const gameContainer = document.getElementById('game');
 const size = 8;
 const mineCount = 10;
@@ -210,13 +203,11 @@ function reveal(index) {
   const cell = cells[index];
   if (cell.classList.contains('revealed')) return;
   cell.classList.add('revealed');
-
   if (minePositions.includes(index)) {
     cell.textContent = '💣';
     alert('Game Over');
     return;
   }
-
   const count = getNeighbors(index).filter(i => minePositions.includes(i)).length;
   if (count > 0) {
     cell.textContent = count;
@@ -229,7 +220,6 @@ function initGame() {
   gameContainer.innerHTML = '';
   cells.length = 0;
   generateMines();
-
   for (let i = 0; i < size * size; i++) {
     const cell = document.createElement('div');
     cell.className = 'cell';
