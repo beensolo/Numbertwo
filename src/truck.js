@@ -27,7 +27,7 @@ const textureLoader = new THREE.TextureLoader();
 const clickableMeshes = [];
 
 const loader = new GLTFLoader();
-loader.load('/ptruck.glb', glb => {
+loader.load('ptruck.glb', glb => {
   const model = glb.scene;
   model.position.y = 0.5;
   model.scale.set(1, 1, 1);
@@ -35,7 +35,7 @@ loader.load('/ptruck.glb', glb => {
   model.traverse(child => {
     if (child.isMesh) {
       if (child.name.toLowerCase() === 'plane') {
-        const bakedTexture = textureLoader.load('/noise_texture.png');
+        const bakedTexture = textureLoader.load('noise_texture.png');
         child.material = new THREE.MeshBasicMaterial({ map: bakedTexture });
       }
 
