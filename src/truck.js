@@ -66,7 +66,7 @@ canvas.addEventListener('click', event => {
     }
   }
 
-  
+
 });
 
 canvas.addEventListener('mousemove', event => {
@@ -120,6 +120,52 @@ window.addEventListener('resize', () => {
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
 });
+
+// Touch Controls
+let lastTouch = null;
+let initialPinchDistance = null;
+let initialCameraZ = camera.position.z;
+
+canvas.addEventListener('touchstart', e => {
+  if (e.touches.length === 1) {
+    lastTouch = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  } else if (e.touches.length === 2) {
+    const dx = e.touches[0].clientX - e.touches[1].clientX;
+    const dy = e.touches[0].clientY - e.touches[1].clientY;
+    initialPinchDistance = Math.sqrt(dx * dx + dy * dy);
+    initialCameraZ = camera.position.z;
+  }
+}, { passive: false });
+
+canvas.addEventListener('touchmove', e => {
+  e.preventDefault();
+  if (e.touches.length === 1 && lastTouch) {
+    const deltaX = e.touches[0].clientX - lastTouch.x;
+    const deltaY = e.touches[0].clientY - lastTouch.y;
+
+    rotationY -= deltaX * 0.01;
+    rotationX += deltaY * 0.005;
+    rotationX = THREE.MathUtils.clamp(rotationX, 0, 1);
+
+    pivot.rotation.set(rotationX, rotationY, 0);
+
+    lastTouch.x = e.touches[0].clientX;
+    lastTouch.y = e.touches[0].clientY;
+  } else if (e.touches.length === 2 && initialPinchDistance !== null) {
+    const dx = e.touches[0].clientX - e.touches[1].clientX;
+    const dy = e.touches[0].clientY - e.touches[1].clientY;
+    const currentDistance = Math.sqrt(dx * dx + dy * dy);
+
+    const zoomFactor = initialPinchDistance / currentDistance;
+    camera.position.z = THREE.MathUtils.clamp(initialCameraZ * zoomFactor, 5, 100);
+  }
+}, { passive: false });
+
+canvas.addEventListener('touchend', () => {
+  lastTouch = null;
+  initialPinchDistance = null;
+});
+
 
 function animate() {
   requestAnimationFrame(animate);
