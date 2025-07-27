@@ -10,26 +10,124 @@
       margin: 0;
       overflow: hidden;
     }
-
     canvas {
       display: block;
       width: 100vw;
       height: 100vh;
     }
-
     body.default-cursor {
       cursor: auto;
     }
-
     body.gun-cursor {
       cursor: url('/cartoon_gun_cursor.png'), auto;
+    }
+    #minesweeper {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 200px;
+      background: #333;
+      color: white;
+      padding: 10px;
+      border: 2px solid #666;
+      font-family: monospace;
+      z-index: 999;
+    }
+    #game {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      gap: 2px;
+    }
+    .cell {
+      width: 20px;
+      height: 20px;
+      background: #999;
+      text-align: center;
+      line-height: 20px;
+      cursor: pointer;
+    }
+    .cell.revealed {
+      background: #eee;
+      color: #000;
     }
   </style>
 </head>
 <body>
   <canvas id="canvas"></canvas>
 
-  <!-- ✅ Load your script -->
+  <div id="minesweeper">
+    <div>Minesweeper</div>
+    <div id="game"></div>
+  </div>
+
   <script type="module" src="./src/truck.js"></script>
+
+  <!-- ✅ Separate inline script for Minesweeper (AFTER canvas and game div exist) -->
+  <script>
+    const gameContainer = document.getElementById('game');
+    const size = 8;
+    const mineCount = 10;
+    const cells = [];
+    let minePositions = [];
+
+    function generateMines() {
+      minePositions = [];
+      while (minePositions.length < mineCount) {
+        const pos = Math.floor(Math.random() * size * size);
+        if (!minePositions.includes(pos)) minePositions.push(pos);
+      }
+    }
+
+    function getNeighbors(index) {
+      const neighbors = [];
+      const row = Math.floor(index / size);
+      const col = index % size;
+      for (let r = -1; r <= 1; r++) {
+        for (let c = -1; c <= 1; c++) {
+          if (r === 0 && c === 0) continue;
+          const nr = row + r;
+          const nc = col + c;
+          if (nr >= 0 && nr < size && nc >= 0 && nc < size) {
+            neighbors.push(nr * size + nc);
+          }
+        }
+      }
+      return neighbors;
+    }
+
+    function reveal(index) {
+      const cell = cells[index];
+      if (cell.classList.contains('revealed')) return;
+      cell.classList.add('revealed');
+
+      if (minePositions.includes(index)) {
+        cell.textContent = '💣';
+        alert('Game Over');
+        return;
+      }
+
+      const count = getNeighbors(index).filter(i => minePositions.includes(i)).length;
+      if (count > 0) {
+        cell.textContent = count;
+      } else {
+        getNeighbors(index).forEach(reveal);
+      }
+    }
+
+    function initGame() {
+      gameContainer.innerHTML = '';
+      cells.length = 0;
+      generateMines();
+      for (let i = 0; i < size * size; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        cell.addEventListener('click', () => reveal(i));
+        gameContainer.appendChild(cell);
+        cells.push(cell);
+      }
+    }
+
+    initGame();
+  </script>
 </body>
 </html>

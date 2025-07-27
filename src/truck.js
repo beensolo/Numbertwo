@@ -65,6 +65,8 @@ canvas.addEventListener('click', event => {
       return;
     }
   }
+
+  
 });
 
 canvas.addEventListener('mousemove', event => {
