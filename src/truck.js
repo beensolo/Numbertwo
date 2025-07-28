@@ -39,7 +39,7 @@ loader.load('ptruck.glb', glb => {
       if (name === 'plane') {
         const bakedTexture = textureLoader.load('noise_texture.png');
         bakedTexture.flipY = false;
-        bakedTexture.offset.y = -0.28;
+       
         child.material = new THREE.MeshBasicMaterial({ map: bakedTexture });
       }
 
